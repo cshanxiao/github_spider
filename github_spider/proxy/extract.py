@@ -33,7 +33,7 @@ def get_ip181_proxies():
 
     return proxy_list
 
-if __name__ == '__main__':
+def get_proxy():
     while 1:
         try:
             proxies = get_ip181_proxies()

@@ -4,5 +4,5 @@ redis
 grequests
 requests
 pyquery
-celery
+celery==3.1.24
 retrying

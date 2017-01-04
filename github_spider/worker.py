@@ -27,7 +27,6 @@ def mongo_save_entity(entity, is_user=True):
 @app.task
 def mongo_save_relation(entity, relation_type):
     """把用户与用户或用户与项目的关系写入mongo
-
     Args:
         entity (dict): 数据
         relation_type (bool): 关系类型
