@@ -4,7 +4,9 @@ import time
 
 import grequests
 import requests
-from retrying import retry
+from tenacity import retry
+from tenacity.retry import retry_if_result
+from tenacity.stop import stop_after_attempt
 
 from github_spider.const import (
     PROXY_KEY,
@@ -51,8 +53,8 @@ def exception_handler(request, exception):
     LOGGER.exception(exception)
 
 
-@retry(stop_max_attempt_number=REQUEST_RETRY_COUNT,
-       retry_on_result=lambda result: not result)
+@retry(stop=stop_after_attempt(REQUEST_RETRY_COUNT),
+       retry=retry_if_result(lambda result: not result))
 def async_get(urls):
     """
     :summary: 异步请求数据

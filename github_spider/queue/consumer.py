@@ -8,7 +8,8 @@ import logging
 from kombu import Connection, Queue
 from kombu.mixins import ConsumerMixin
 import requests
-from retrying import retry
+from tenacity import retry
+from tenacity.stop import stop_after_attempt
 
 from github_spider.const import (
     PROXY_KEY,
@@ -46,7 +47,7 @@ from github_spider.worker import (
 
 
 LOGGER = logging.getLogger(__name__)
-retry_get = retry(stop_max_attempt_number=REQUEST_RETRY_COUNT)(requests.get)
+retry_get = retry(stop=stop_after_attempt(REQUEST_RETRY_COUNT))(requests.get)
 
 
 def request_deco(func):

@@ -2,7 +2,8 @@
 import gevent
 from kombu import Connection, Exchange
 from kombu.pools import producers
-from retrying import retry
+from tenacity import retry
+from tenacity.stop import stop_after_attempt
 
 from github_spider.const import MESSAGE_QUEUE_EXCHANGE
 from github_spider.settings import MESSAGE_BROKER_URI
@@ -28,7 +29,7 @@ class Producer(object):
         self.exchange = Exchange(exchange_name, type='direct')
         self.connection = Connection(broker_url)
 
-    @retry(stop_max_attempt_number=5)
+    @retry(stop=stop_after_attempt(5))
     def _sync_send(self, payload, routing_key, **kwargs):
         """
         :summary: 发送url至指定队列
