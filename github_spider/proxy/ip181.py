@@ -1,27 +1,27 @@
 # -*- coding=utf8 -*-
-"""
-    从网上爬取HTTPS代理
+u"""
+:summary: 从网上爬取HTTPS代理
 """
 import re
 import time
 
-import requests
 from pyquery import PyQuery
+import requests
 
-from github_spider.extensions import redis_client
 from github_spider.const import PROXY_KEY
+from github_spider.extensions import redis_client
 from github_spider.settings import PROXY_USE_COUNT
 
 
-def get_ip181_proxies():
+def ProxyIp181():
+    u"""
+    :summary: 获取HTTPS代理，http://www.ip181.com/
     """
-    http://www.ip181.com/获取HTTPS代理
-    """
-    html_page = requests.get('http://www.ip181.com/').content.decode('gb2312')
-    jq = PyQuery(html_page)
+    content = requests.get('http://www.ip181.com/').content.decode('gb2312')
+    pq = PyQuery(content)
 
     proxy_list = []
-    for tr in jq("tr"):
+    for tr in pq("tr"):
         element = [PyQuery(td).text() for td in PyQuery(tr)("td")]
         if 'HTTPS' not in element[3]:
             continue
@@ -34,10 +34,9 @@ def get_ip181_proxies():
     return proxy_list
 
 def get_proxy():
-    while 1:
+    while True:
         try:
-            proxies = get_ip181_proxies()
-
+            proxies = ProxyIp181()
             redis_client.zremrangebyscore(PROXY_KEY, PROXY_USE_COUNT, 10000)
 
             for host, port in proxies:
@@ -45,7 +44,7 @@ def get_proxy():
                 print(address)
                 if redis_client.zscore(PROXY_KEY, address) is None:
                     redis_client.zadd(PROXY_KEY, address, 0)
-        except Exception as exc:
-            print(exc)
+        except Exception, e:
+            print e
         finally:
             time.sleep(10 * 60)

@@ -1,21 +1,33 @@
 # -*- coding=utf8 -*-
 """
-    消费者
+:summary: 消费者
 """
-import logging
 import functools
+import logging
 
-
-import requests
-from retrying import retry
 from kombu import Connection, Queue
 from kombu.mixins import ConsumerMixin
+import requests
+from retrying import retry
 
-from github_spider.queue.producer import url_sender
+from github_spider.const import (
+    PROXY_KEY,
+    HEADERS,
+    REDIS_VISITED_URLS,
+    RoutingKey,
+    QueueName,
+    MongodbCollection
+)
 from github_spider.extensions import redis_client
-from github_spider.worker import (
-    mongo_save_entity,
-    mongo_save_relation,
+from github_spider.queue.producer import url_sender
+from github_spider.settings import (
+    MESSAGE_BROKER_URI,
+    USER_CONSUMER_COUNT,
+    FOLLOWER_CONSUMER_COUNT,
+    FOLLOWING_CONSUMER_COUNT,
+    REPO_CONSUMER_COUNT,
+    REQUEST_RETRY_COUNT,
+    TIMEOUT
 )
 from github_spider.utils import (
     gen_user_repo_url,
@@ -27,23 +39,11 @@ from github_spider.utils import (
     find_login_by_url,
     gen_user_page_url,
 )
-from github_spider.settings import (
-    MESSAGE_BROKER_URI,
-    USER_CONSUMER_COUNT,
-    FOLLOWER_CONSUMER_COUNT,
-    FOLLOWING_CONSUMER_COUNT,
-    REPO_CONSUMER_COUNT,
-    REQUEST_RETRY_COUNT,
-    TIMEOUT
+from github_spider.worker import (
+    mongo_save_entity,
+    mongo_save_relation,
 )
-from github_spider.const import (
-    PROXY_KEY,
-    HEADERS,
-    REDIS_VISITED_URLS,
-    RoutingKey,
-    QueueName,
-    MongodbCollection
-)
+
 
 LOGGER = logging.getLogger(__name__)
 retry_get = retry(stop_max_attempt_number=REQUEST_RETRY_COUNT)(requests.get)
@@ -51,7 +51,7 @@ retry_get = retry(stop_max_attempt_number=REQUEST_RETRY_COUNT)(requests.get)
 
 def request_deco(func):
     """
-    调用github API的装饰器
+    :summary: 调用github API的装饰器
     """
     @functools.wraps(func)
     def _inner(self, body, message):
@@ -92,12 +92,11 @@ def request_deco(func):
 
 class BaseConsumer(ConsumerMixin):
     """
-    消费者公共类
+    :summary: 消费者公共类
     """
     def __init__(self, broker_url, queue_name, fetch_count=10):
-        """初始化消费者
-
-        Args:
+        """
+        :Args:
             broker_url (string): broker地址
             queue_name (string): 消费的队列名称
             fetch_count (int): 一次消费的个数
@@ -111,13 +110,13 @@ class BaseConsumer(ConsumerMixin):
 
     def handle_url(self, body, message):
         """
-        处理队列中的url
+        :summary: 处理队列中的url
         """
         raise NotImplementedError
 
     def get_consumers(self, Consumer, channel):
         """
-        继承
+        :summary: 继承
         """
         consumer = Consumer(
             self.queue,
@@ -130,12 +129,12 @@ class BaseConsumer(ConsumerMixin):
 
 class UserConsumer(BaseConsumer):
     """
-    用户队列消费者
+    :summary: 用户队列消费者
     """
     @request_deco
     def handle_url(self, body, message):
         """
-        解析用户数据
+        :summary: 解析用户数据
         """
         url, data = body
         user = {
@@ -169,12 +168,12 @@ class UserConsumer(BaseConsumer):
 
 class RepoConsumer(BaseConsumer):
     """
-    repo队列消费者
+    :summary: repo队列消费者
     """
     @request_deco
     def handle_url(self, body, message):
         """
-        解析项目数据
+        :summary: 解析项目数据
         """
         url, data = body
 
@@ -202,11 +201,11 @@ class RepoConsumer(BaseConsumer):
 
 class FollowConsumer(BaseConsumer):
     """
-    用户关系消费者
+    :summary: 用户关系消费者
     """
     def __init__(self, kind, broker_url, queue_name, fetch_count=10):
         """
-        kind指是following还是follower
+        :summary: kind指是following还是follower
         """
         BaseConsumer.__init__(self, broker_url, queue_name, fetch_count)
         self.kind = kind
@@ -214,7 +213,7 @@ class FollowConsumer(BaseConsumer):
     @request_deco
     def handle_url(self, body, message):
         """
-        解析人员关系数据
+        :summary: 解析人员关系数据
         """
         url, data = body
 
@@ -228,7 +227,7 @@ class FollowConsumer(BaseConsumer):
         mongo_save_relation.delay({'id': user, 'list': users}, self.kind)
         map(lambda x: url_sender.send_url(x, RoutingKey.USER), urls)
 
-consumer_list = [UserConsumer(MESSAGE_BROKER_URI, QueueName.USER)] * USER_CONSUMER_COUNT + \
-                [RepoConsumer(MESSAGE_BROKER_URI, QueueName.REPO)] * REPO_CONSUMER_COUNT + \
-                [FollowConsumer(MongodbCollection.FOLLOWER, MESSAGE_BROKER_URI, QueueName.FOLLOWER)] * FOLLOWER_CONSUMER_COUNT + \
-                [FollowConsumer(MongodbCollection.FOLLOWING, MESSAGE_BROKER_URI, QueueName.FOLLOWING)] * FOLLOWING_CONSUMER_COUNT
+consumer_list = [UserConsumer(MESSAGE_BROKER_URI, QueueName.USER)] * USER_CONSUMER_COUNT \
+    + [RepoConsumer(MESSAGE_BROKER_URI, QueueName.REPO)] * REPO_CONSUMER_COUNT \
+    + [FollowConsumer(MongodbCollection.FOLLOWER, MESSAGE_BROKER_URI, QueueName.FOLLOWER)] * FOLLOWER_CONSUMER_COUNT \
+    + [FollowConsumer(MongodbCollection.FOLLOWING, MESSAGE_BROKER_URI, QueueName.FOLLOWING)] * FOLLOWING_CONSUMER_COUNT

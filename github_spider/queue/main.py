@@ -1,7 +1,4 @@
 # -*- coding=utf8 -*-
-"""
-    主函数
-"""
 from multiprocessing import Process
 
 from github_spider.queue.consumer import consumer_list

@@ -1,7 +1,4 @@
 # -*- coding=utf8 -*-
-"""
-    主流程
-"""
 import signal
 import gevent
 import sys
@@ -15,9 +12,6 @@ from github_spider.const import REDIS_VISITED_URLS
 
 
 def main():
-    """
-    主流程函数
-    """
     redis_client.delete(REDIS_VISITED_URLS)
     start_user_url = gen_user_page_url(START_USER)
     

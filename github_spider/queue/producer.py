@@ -1,27 +1,22 @@
 # -*- coding=utf8 -*-
-"""
-    往队列发送消息
-"""
 import gevent
-from retrying import retry
 from kombu import Connection, Exchange
 from kombu.pools import producers
+from retrying import retry
 
-from github_spider.settings import MESSAGE_BROKER_URI
 from github_spider.const import MESSAGE_QUEUE_EXCHANGE
+from github_spider.settings import MESSAGE_BROKER_URI
+
 
 SYNC = 1
 ASYNC = 2
 
 
 class Producer(object):
-    """
-    生产者
-    """
     def __init__(self, exchange_name, broker_url, mode=ASYNC):
-        """初始化生产者
-
-        Args:
+        """
+        :summary: 初始化生产者
+        :Args:
             exchange_name (string): 路由名称
             broker_url (string): 连接地址
             mode (int): 发送
@@ -35,8 +30,8 @@ class Producer(object):
 
     @retry(stop_max_attempt_number=5)
     def _sync_send(self, payload, routing_key, **kwargs):
-        """发送url至指定队列
-
+        """
+        :summary: 发送url至指定队列
         Args:
             payload (string): 消息内容
             routing_key (string)
@@ -46,9 +41,9 @@ class Producer(object):
                       routing_key=routing_key, **kwargs)
 
     def _async_send(self, payload, routing_key, **kwargs):
-        """发送url至指定队列
-
-        Args:
+        """
+        :summary: 发送url至指定队列
+        :Args:
             payload (string): 消息内容
             routing_key (string)
         """
@@ -56,9 +51,9 @@ class Producer(object):
         gevent.sleep(0)
 
     def send_url(self, url, routing_key, **kwargs):
-        """发送url至指定队列
-
-        Args:
+        """
+        :summary: 发送url至指定队列
+        :Args:
             url (string): url地址
             routing_key (string)
         """

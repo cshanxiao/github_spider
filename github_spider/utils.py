@@ -1,22 +1,23 @@
 # -*- coding=utf8 -*-
 """
-    工具函数
+:summary: 工具函数
 """
 import urlparse
-from github_spider.extensions import redis_client
-from github_spider.settings import PROXY_USE_COUNT
+
 from github_spider.const import (
     GITHUB_API_HOST,
     PAGE_SIZE,
     PROXY_KEY,
     REDIS_VISITED_URLS,
 )
+from github_spider.extensions import redis_client
+from github_spider.settings import PROXY_USE_COUNT
 
 
 def gen_user_page_url(user_name):
-    """获取用户主页url
-
-    Args:
+    """
+    :summary: 获取用户主页url
+    :Args:
         user_name (string): github用户id
         page (int): 页号
     """
@@ -24,57 +25,57 @@ def gen_user_page_url(user_name):
 
 
 def gen_user_follwer_url(user_name, page=1):
-    """获取用户粉丝列表url
-
-    Args:
+    """
+    :summary:获取用户粉丝列表url
+    :Args:
         user_name (string): github用户id
         page (int): 页号
     """
-    return 'https://{}/users/{}/followers?page={}'.format(GITHUB_API_HOST,
-                                                          user_name, page)
+    return 'https://{}/users/{}/followers?page={}'.format(
+        GITHUB_API_HOST, user_name, page)
 
 
 def gen_user_following_url(user_name, page=1):
-    """获取用户关注用户列表url
-
-    Args:
+    """
+    :summary: 获取用户关注用户列表url
+    :Args:
         user_name (string): github用户id
         page (int): 页号
     """
-    return 'https://{}/users/{}/following?page={}'.format(GITHUB_API_HOST,
-                                                          user_name, page)
+    return 'https://{}/users/{}/following?page={}'.format(
+        GITHUB_API_HOST, user_name, page)
 
 
 def gen_user_repo_url(user_name, page=1):
-    """获取用户项目列表url
-
-    Args:
+    """
+    :summary: 获取用户项目列表url
+    :Args:
         user_name (string): github用户id
         page (int): 页号
     """
-    return 'https://{}/users/{}/repos?page={}'.format(GITHUB_API_HOST,
-                                                      user_name, page)
+    return 'https://{}/users/{}/repos?page={}'.format(
+        GITHUB_API_HOST, user_name, page)
 
 
 def get_short_url(url):
     """
-    去掉url前面的https://api.github.com/
+    :summary: 去掉url前面的https://api.github.com/
     """
     return url[23:-1]
 
 
 def find_login_by_url(url):
     """
-    获取url中的用户名
+    :summary: 获取url中的用户名
     """
     result = urlparse.urlsplit(url)
     return result.path.split('/')[2]
 
 
 def gen_url_list(user_name, func, count):
-    """调用func生成url列表
-
-    Args:
+    """
+    :summary: 调用func生成url列表
+    :Args:
         user_name (string): 用户名
         func (func): 生成函数
         count (int): 总个数
@@ -89,7 +90,7 @@ def gen_url_list(user_name, func, count):
 
 def check_url_visited(urls):
     """
-    判断url是否重复访问过
+    :summary: 判断url是否重复访问过
     """
     result = []
     for url in urls:
@@ -102,7 +103,7 @@ def check_url_visited(urls):
 
 def get_proxy():
     """
-    从redis获取代理
+    :summary: 从redis获取代理
     """
     available_proxy = redis_client.zrangebyscore(PROXY_KEY, 0, PROXY_USE_COUNT)
     if available_proxy:

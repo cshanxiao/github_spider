@@ -1,16 +1,12 @@
 # -*- coding=utf8 -*-
 """
-    流程控制
+:summary: 流程控制
 """
 import logging
 
 from github_spider.const import (
     REDIS_VISITED_URLS,
     MongodbCollection,
-)
-from github_spider.worker import (
-    mongo_save_entity,
-    mongo_save_relation,
 )
 from github_spider.extensions import redis_client
 from github_spider.utils import (
@@ -21,14 +17,19 @@ from github_spider.utils import (
     gen_user_page_url,
     check_url_visited,
 )
+from github_spider.worker import (
+    mongo_save_entity,
+    mongo_save_relation,
+)
+
 
 LOGGER = logging.getLogger(__name__)
 
 
 def request_api(urls, method, callback, **kwargs):
-    """请求API数据
-
-    Args:
+    """
+    :summary: 请求API数据
+    :Args:
         urls (list): 请求url列表
         method (func): 请求方法
         callback (func): 回调函数
@@ -47,9 +48,9 @@ def request_api(urls, method, callback, **kwargs):
 
 
 def parse_user(data, method):
-    """解析用户数据
-
-    Args:
+    """
+    :summary: 解析用户数据
+    :Args:
         data (dict): 用户数据
         method (func): 请求方法
     """
@@ -89,9 +90,9 @@ def parse_user(data, method):
 
 
 def parse_repos(data, method, user=None):
-    """解析项目数据
-
-    Args:
+    """
+    :summary: 解析项目数据
+    :Args:
         data (list): 用户数据
         method (func): 请求函数
         user (string): 用户
@@ -125,9 +126,9 @@ def parse_repos(data, method, user=None):
 
 
 def parse_follow(data, method, kind=MongodbCollection.FOLLOWER, user=None):
-    """解析关注关系
-
-     Args:
+    """
+    :summary: 解析关注关系
+    :Args:
         data (list): 请求数据
         method (func): 请求函数
         kind (string): 是关注的人还是关注着

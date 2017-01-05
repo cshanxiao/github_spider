@@ -13,7 +13,7 @@
 
 1. 进入github_spider目录
 2. 执行命令```celery -A github_spider.worker worker --loglevel=info```启动异步任务
-3. 执行命令```python github_spider/recursion/main.py```启动爬虫
+3. 执行命令```python main.py```启动爬虫
 
 ## 运行结果
 
@@ -54,8 +54,8 @@
 
 1. 进入github_spider目录
 2. 执行命令```celery -A github_spider.worker worker loglevel=info```启动异步任务
-3. 执行命令```python github_spider/proxy/extract.py```更新代理
-4. 执行命令```python github_spider/queue/main.py```启动脚本
+3. 执行命令```python proxy_spider```更新代理
+4. 执行命令```python main.py```启动脚本
 
 队列状态图：
 

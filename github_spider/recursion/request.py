@@ -1,31 +1,27 @@
 # -*- coding=utf8 -*-
-"""
-    异步请求方法
-"""
-import time
 import logging
-import requests
+import time
+
 import grequests
+import requests
 from retrying import retry
 
-from github_spider.extensions import redis_client
 from github_spider.const import (
     PROXY_KEY,
     HEADERS,
 )
+from github_spider.extensions import redis_client
 from github_spider.settings import (
     TIMEOUT,
     REQUEST_RETRY_COUNT,
 )
 from github_spider.utils import get_proxy
 
+
 LOGGER = logging.getLogger(__name__)
 
 
 def request_with_proxy(url):
-    """
-    proxy访问url
-    """
     for i in range(REQUEST_RETRY_COUNT):
         proxy = get_proxy()
         if not proxy:
@@ -46,7 +42,7 @@ def request_with_proxy(url):
 
 def exception_handler(request, exception):
     """
-    操作错误
+    :summary: 操作错误
     """
     proxy = request.kwargs.get('proxies', {}).get('https', '')[7:]
     redis_client.zrem(PROXY_KEY, proxy)
@@ -59,7 +55,7 @@ def exception_handler(request, exception):
        retry_on_result=lambda result: not result)
 def async_get(urls):
     """
-    异步请求数据
+    :summary: 异步请求数据
     """
     rs = []
     for url in urls:
@@ -77,7 +73,7 @@ def async_get(urls):
 
 def sync_get(urls):
     """
-    同步请求数据
+    :summary: 同步请求数据
     """
     result = []
     for url in urls:

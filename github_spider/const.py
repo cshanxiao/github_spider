@@ -27,7 +27,7 @@ HEADERS = {
 
 class MongodbCollection(object):
     """
-    用到的mongodb collection名称
+    :summary: 用到的mongodb collection名称
     """
     USER = 'user'
     REPO = 'repo'
@@ -38,7 +38,7 @@ class MongodbCollection(object):
 
 class RoutingKey(object):
     """
-    消息队列路由
+    :summary: 消息队列路由
     """
     USER = 'user'
     REPO = 'repo'
@@ -48,7 +48,7 @@ class RoutingKey(object):
 
 class QueueName(object):
     """
-    消息队列名称
+    :summary: 消息队列名称
     """
     USER = 'user'
     REPO = 'repo'
