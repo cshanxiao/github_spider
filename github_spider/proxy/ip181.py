@@ -17,7 +17,8 @@ def ProxyIp181():
     u"""
     :summary: 获取HTTPS代理，http://www.ip181.com/
     """
-    content = requests.get('http://www.ip181.com/').content.decode('gb2312')
+    content = requests.get('http://www.ip181.com/').content\
+        .decode('gb2312')
     pq = PyQuery(content)
 
     proxy_list = []
@@ -30,7 +31,6 @@ def ProxyIp181():
         if result and float(result.group()) > 5:
             continue
         proxy_list.append((element[0], element[1]))
-
     return proxy_list
 
 def get_proxy():

@@ -10,6 +10,6 @@ from github_spider.settings import (
 
 
 mongo_client = MongoClient(MONGO_URI)
-redis_client = Redis.from_url(REDIS_URI)
+redis_client = Redis.from_url(REDIS_URI, socket_keepalive=True)
 
 mongo_db = mongo_client[MONGO_DB_NAME]
