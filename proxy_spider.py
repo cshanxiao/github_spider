@@ -8,4 +8,4 @@ from github_spider.proxy.ip181 import get_proxy
 
 
 if __name__ == '__main__':
-    get_proxy()
+    get_proxy(test_url="https://api.github.com/users/cshanxiao")

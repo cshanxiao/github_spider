@@ -17,8 +17,8 @@ def ProxyIp181():
     u"""
     :summary: 获取HTTPS代理，http://www.ip181.com/
     """
-    content = requests.get('http://www.ip181.com/').content\
-        .decode('gb2312')
+    content = requests.get('http://www.ip181.com/').content
+#     .decode('gb2312')
     pq = PyQuery(content)
 
     proxy_list = []
@@ -33,7 +33,7 @@ def ProxyIp181():
         proxy_list.append((element[0], element[1]))
     return proxy_list
 
-def get_proxy():
+def get_proxy(test_url="https://www.baidu.com", delay=10):
     while True:
         try:
             proxies = ProxyIp181()
@@ -41,9 +41,19 @@ def get_proxy():
 
             for host, port in proxies:
                 address = '{}:{}'.format(host, port)
-                print(address)
-                if redis_client.zscore(PROXY_KEY, address) is None:
-                    redis_client.zadd(PROXY_KEY, address, 0)
+                try:
+                    t1 = time.time()
+                    proxy_map = {'https': 'http://{}'.format(address)}
+                    requests.get(test_url, proxies=proxy_map, timeout=delay)
+                    t2 = time.time()
+                    if t2 - t1 > delay:
+                        continue 
+                    print "address", address
+                    if redis_client.zscore(PROXY_KEY, address) is None:
+                        redis_client.zadd(PROXY_KEY, address, 0)
+                except:
+                    print "host: {}, port: {} timeout.".format(host, port) 
+
         except Exception, e:
             print e
         finally:

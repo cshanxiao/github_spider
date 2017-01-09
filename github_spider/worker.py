@@ -8,16 +8,14 @@ app = Celery('write_mongo', broker=CELERY_BROKER_URI)
 
 
 @app.task
-def mongo_save_entity(entity, is_user=True):
+def mongo_save_entity(entity, collection_name):
     """
-    :summary: 把user或repo信息写入mongo
+    :summary: 把数据写入mongo
     :Args:
         entity (dict): 数据
-        is_user (bool): 用户数据还是项目数据
+        collection_name: 数据集名称
     """
-    collection_name = MongodbCollection.USER \
-        if is_user else MongodbCollection.REPO
-    mongo_collection = mongo_db[collection_name]
+    mongo_collection = mongo_db[str(collection_name)]
     mongo_collection.update({'id': entity['id']}, entity, upsert=True)
 
 

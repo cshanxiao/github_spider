@@ -31,6 +31,7 @@ class MongodbCollection(object):
     """
     USER = 'user'
     REPO = 'repo'
+    REPO_DETAIL = 'repo_detail'
     USER_REPO = 'user_repo'
     FOLLOWER = 'follower'
     FOLLOWING = 'following'

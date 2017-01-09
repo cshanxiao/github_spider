@@ -152,7 +152,7 @@ class UserConsumer(BaseConsumer):
             'following': data.get('following', 0),
             'created_at': data.get('created_at')
         }
-        mongo_save_entity.delay(user)
+        mongo_save_entity.delay(user, MongodbCollection.USER)
 
         follower_urls = gen_url_list(user['id'], gen_user_follwer_url,
                                      user['followers'])
@@ -195,7 +195,7 @@ class RepoConsumer(BaseConsumer):
                 'fork_count': element.get('fork_count'),
             }
             repo_list.append(repo['name'])
-            mongo_save_entity.delay(repo, False)
+            mongo_save_entity.delay(repo, MongodbCollection.REPO)
         mongo_save_relation.delay({'id': user, 'list': repo_list},
                                   MongodbCollection.USER_REPO)
 
